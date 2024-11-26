@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog_app.service.BlogService;
+
+import jakarta.validation.Valid;
+
 import com.example.blog_app.dto.ApiResponse;
 import com.example.blog_app.model.BlogPost;;
 
@@ -43,7 +46,7 @@ public class BlogController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<BlogPost>> createPost(@RequestBody BlogPost post) {
+    public ResponseEntity<ApiResponse<BlogPost>> createPost(@Valid @RequestBody BlogPost post) {
         BlogPost createdPost = blogService.createPost(post);
         if(createdPost == null) {
             return ResponseEntity.status(500).body(new ApiResponse<>("Failed to create post.", null, 500));
@@ -53,13 +56,13 @@ public class BlogController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<BlogPost>> updatePost(@PathVariable String id, @RequestBody BlogPost post) {
+    public ResponseEntity<ApiResponse<BlogPost>> updatePost(@PathVariable String id, @Valid @RequestBody BlogPost post) {
         BlogPost updatedPost = blogService.updatePost(id, post);
         if (updatedPost == null) {
             return ResponseEntity.status(404).body(new ApiResponse<>("Post not found. Unable to update.", null, 404))  ;
         }
 
-        return ResponseEntity.ok(new ApiResponse<>("Post updated successfully.", post, 200));
+        return ResponseEntity.ok(new ApiResponse<>("Post updated successfully.", updatedPost, 200));
     }   
 
     @DeleteMapping("/{id}")

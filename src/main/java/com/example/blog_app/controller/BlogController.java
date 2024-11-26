@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog_app.service.BlogService;
+import com.example.blog_app.dto.ApiResponse;
 import com.example.blog_app.model.BlogPost;;
 
 @RestController
@@ -25,41 +26,48 @@ public class BlogController {
     }
 
     @GetMapping
-    public List<BlogPost> getAllPosts() {
-        return blogService.getAllPosts();
+    public ResponseEntity<ApiResponse<List<BlogPost>>> getAllPosts() {
+        List<BlogPost> posts = blogService.getAllPosts();
+        String message = posts.isEmpty() ? "No blog posts found." : "Blog posts retrieved successfully.";
+        return ResponseEntity.ok(new ApiResponse<>(message, posts, 200));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BlogPost> getPostById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<BlogPost>> getPostById(@PathVariable String id) {
         BlogPost post = blogService.getPostById(id);
         if (post == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(new ApiResponse<>("Post not found.", null, 404));
         }
 
-        return ResponseEntity.ok(post);
+        return ResponseEntity.ok(new ApiResponse<>("Post retrieved successfully.", post, 200));
     }
 
     @PostMapping
-    public BlogPost createPost(@RequestBody BlogPost post) {
-        return blogService.createPost(post);
+    public ResponseEntity<ApiResponse<BlogPost>> createPost(@RequestBody BlogPost post) {
+        BlogPost createdPost = blogService.createPost(post);
+        if(createdPost == null) {
+            return ResponseEntity.status(500).body(new ApiResponse<>("Failed to create post.", null, 500));
+        }
+
+        return ResponseEntity.status(201).body(new ApiResponse<>("Post created successfully.", createdPost, 201));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BlogPost> updatePost(@PathVariable String id, @RequestBody BlogPost post) {
+    public ResponseEntity<ApiResponse<BlogPost>> updatePost(@PathVariable String id, @RequestBody BlogPost post) {
         BlogPost updatedPost = blogService.updatePost(id, post);
         if (updatedPost == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(new ApiResponse<>("Post not found. Unable to update.", null, 404))  ;
         }
 
-        return ResponseEntity.ok(updatedPost);
+        return ResponseEntity.ok(new ApiResponse<>("Post updated successfully.", post, 200));
     }   
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<BlogPost> deletePost(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<BlogPost>> deletePost(@PathVariable String id) {
         BlogPost deletedPost = blogService.deletePost(id);
         if (deletedPost ==  null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(new ApiResponse<>("Post not found. Unable to delete.", null, 404));
         }
-        return ResponseEntity.ok(deletedPost);
+        return ResponseEntity.ok(new ApiResponse<>("Post deleted successfully.", deletedPost, 200));
     }
 }

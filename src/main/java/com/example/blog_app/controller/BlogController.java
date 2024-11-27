@@ -19,15 +19,29 @@ import jakarta.validation.Valid;
 import com.example.blog_app.dto.ApiResponse;
 import com.example.blog_app.model.BlogPost;;
 
+/**
+ * Controller for handling blog post-related HTTP requests.
+ * Provides endpoints for CRUD operations on blog posts.
+ */
 @RestController
 @RequestMapping("/api/posts")
 public class BlogController {
     private final BlogService blogService;
 
+    /**
+     * Constructor to inject the BlogService dependency.
+     *
+     * @param blogService the service layer for BlogPost operations
+     */
     public BlogController(BlogService blogService) {
         this.blogService = blogService;
     }
 
+    /**
+     * Retrieves all blog posts.
+     *
+     * @return a ResponseEntity containing an ApiResponse with a list of BlogPost objects
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<BlogPost>>> getAllPosts() {
         List<BlogPost> posts = blogService.getAllPosts();
@@ -35,6 +49,12 @@ public class BlogController {
         return ResponseEntity.ok(new ApiResponse<>(message, posts, 200));
     }
 
+    /**
+     * Retrieves a specific blog post by ID.
+     *
+     * @param id the ID of the blog post
+     * @return a ResponseEntity containing an ApiResponse with the BlogPost object or a 404 status if not found
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<BlogPost>> getPostById(@PathVariable String id) {
         BlogPost post = blogService.getPostById(id);
@@ -45,6 +65,12 @@ public class BlogController {
         return ResponseEntity.ok(new ApiResponse<>("Post retrieved successfully.", post, 200));
     }
 
+    /**
+     * Creates a new blog post.
+     *
+     * @param post the BlogPost object to create, validated by @Valid
+     * @return a ResponseEntity containing an ApiResponse with the created BlogPost object or a 500 status if creation fails
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<BlogPost>> createPost(@Valid @RequestBody BlogPost post) {
         BlogPost createdPost = blogService.createPost(post);
@@ -55,6 +81,13 @@ public class BlogController {
         return ResponseEntity.status(201).body(new ApiResponse<>("Post created successfully.", createdPost, 201));
     }
 
+    /**
+     * Updates an existing blog post.
+     *
+     * @param id   the ID of the blog post to update
+     * @param post the updated BlogPost object, validated by @Valid
+     * @return a ResponseEntity containing an ApiResponse with the updated BlogPost object or a 404 status if not found
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<BlogPost>> updatePost(@PathVariable String id, @Valid @RequestBody BlogPost post) {
         BlogPost updatedPost = blogService.updatePost(id, post);
@@ -65,6 +98,12 @@ public class BlogController {
         return ResponseEntity.ok(new ApiResponse<>("Post updated successfully.", updatedPost, 200));
     }   
 
+    /**
+     * Deletes a blog post by ID.
+     *
+     * @param id the ID of the blog post to delete
+     * @return a ResponseEntity containing an ApiResponse with the deleted BlogPost object or a 404 status if not found
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<BlogPost>> deletePost(@PathVariable String id) {
         BlogPost deletedPost = blogService.deletePost(id);

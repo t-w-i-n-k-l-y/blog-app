@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @SpringBootApplication
-@EnableMongoAuditing
+@EnableMongoAuditing	// Enables MongoDB auditing, allowing automatic population of fields like createdAt and lastUpdate
 public class BlogAppApplication {
 
 	public static void main(String[] args) {
